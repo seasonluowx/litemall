@@ -56,7 +56,7 @@
         <javaClientGenerator type="XMLMAPPER" targetPackage="org.linlinjava.litemall.db.dao"
                              targetProject="src/main/java"/>
         <!--表名-->
-        <table tableName="litemall_ad">
+        <!--<table tableName="litemall_ad">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
         <table tableName="litemall_address">
@@ -95,13 +95,13 @@
 
         <table tableName="litemall_footprint">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
+        </table>-->
         <table tableName="litemall_goods">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
             <columnOverride column="gallery" javaType="java.lang.String[]"
                             typeHandler="org.linlinjava.litemall.db.mybatis.JsonStringArrayTypeHandler"/>
         </table>
-        <table tableName="litemall_goods_attribute">
+        <!--<table tableName="litemall_goods_attribute">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
         <table tableName="litemall_goods_specification">
@@ -183,6 +183,6 @@
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
             <columnOverride column="pictures" javaType="java.lang.String[]"
                             typeHandler="org.linlinjava.litemall.db.mybatis.JsonStringArrayTypeHandler"/>
-        </table>
+        </table>-->
     </context>
 </generatorConfiguration>

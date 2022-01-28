@@ -88,7 +88,7 @@ public class LitemallGoodsService {
     }
 
 
-    public List<LitemallGoods> querySelective(Integer catId, Integer brandId, String keywords, Boolean isHot, Boolean isNew, Integer offset, Integer limit, String sort, String order) {
+    public List<LitemallGoods> querySelective(Integer catId, Integer brandId, String keywords, Boolean isHot, Boolean isNew,Integer sellType,Integer offset, Integer limit, String sort, String order) {
         LitemallGoodsExample example = new LitemallGoodsExample();
         LitemallGoodsExample.Criteria criteria1 = example.or();
         LitemallGoodsExample.Criteria criteria2 = example.or();
@@ -116,6 +116,8 @@ public class LitemallGoodsService {
         criteria1.andIsOnSaleEqualTo(true);
         criteria2.andIsOnSaleEqualTo(true);
         criteria1.andDeletedEqualTo(false);
+        criteria2.andDeletedEqualTo(false);
+        criteria2.andSellType(false);
         criteria2.andDeletedEqualTo(false);
 
         if (!StringUtils.isEmpty(sort) && !StringUtils.isEmpty(order)) {

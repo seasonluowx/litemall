@@ -252,6 +252,7 @@ public class WxGoodsController {
 		String keyword,
 		Boolean isNew,
 		Boolean isHot,
+		@RequestParam(defaultValue = "1") Integer sellType,
 		@LoginUser Integer userId,
 		@RequestParam(defaultValue = "1") Integer page,
 		@RequestParam(defaultValue = "10") Integer limit,
@@ -268,7 +269,7 @@ public class WxGoodsController {
 		}
 
 		//查询列表数据
-		List<LitemallGoods> goodsList = goodsService.querySelective(categoryId, brandId, keyword, isHot, isNew, page, limit, sort, order);
+		List<LitemallGoods> goodsList = goodsService.querySelective(categoryId, brandId, keyword, isHot, isNew,sellType,page, limit, sort, order);
 
 		// 查询商品所属类目列表。
 		List<Integer> goodsCatIds = goodsService.getCatIds(brandId, keyword, isHot, isNew);
