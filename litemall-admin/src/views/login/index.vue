@@ -30,24 +30,11 @@
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
-      <div style="position:relative">
-        <div class="tips">
-          <span> 超级管理员用户名: admin123</span>
-          <span> 超级管理员用户名：admin123</span>
-        </div>
-        <div class="tips">
-          <span> 商城管理员用户名: mall123</span>
-          <span> 商城管理员用户名：mall123</span>
-        </div>
-        <div class="tips">
-          <span> 推广管理员用户名: promotion123</span>
-          <span> 推广管理员用户名：promotion123</span>
-        </div>
-      </div>
+      <div style="position:relative" />
     </el-form>
 
     <div class="copyright">
-      Copyright © 2021 xxx.com 版权所有 <a href="https://github.com/linlinjava/litemall">沪ICP备xxx号</a>
+      Copyright © @2022卿相（上海）电子商务有限责任公司 <a href="https://beian.miit.gov.cn">沪ICP备2022000394号</a>
     </div>
   </div>
 </template>

@@ -16,6 +16,7 @@ Page({
     banner: [],
     channel: [],
     coupon: [],
+    seckill: [],
     goodsCount: 0
   },
 
@@ -46,6 +47,7 @@ Page({
           floorGoods: res.data.floorGoodsList,
           banner: res.data.banner,
           groupons: res.data.grouponList,
+          seckill: res.data.seckillList,
           channel: res.data.channel,
           coupon: res.data.couponList
         });
