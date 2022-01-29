@@ -1,6 +1,7 @@
 package www.qingxiangyx.litemall.db.service;
 
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
 import www.qingxiangyx.litemall.db.dao.LitemallGoodsMapper;
 import www.qingxiangyx.litemall.db.domain.LitemallGoods;
 import www.qingxiangyx.litemall.db.domain.LitemallGoods.Column;
@@ -12,7 +13,6 @@ import www.qingxiangyx.litemall.db.enums.GoodSellTypeEnum;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -264,8 +264,13 @@ public class LitemallGoodsService {
     }
 
     public List<LitemallGoods> queryByIds(Integer[] ids) {
+        List<Integer> idList = Lists.newArrayList(ids);
+        return queryByIdList(idList);
+    }
+
+    public List<LitemallGoods> queryByIdList(List<Integer> idList) {
         LitemallGoodsExample example = new LitemallGoodsExample();
-        example.or().andIdIn(Arrays.asList(ids)).andIsOnSaleEqualTo(true).andDeletedEqualTo(false);
+        example.or().andIdIn(idList).andIsOnSaleEqualTo(true).andDeletedEqualTo(false);
         return goodsMapper.selectByExampleSelective(example, columns);
     }
 }

@@ -3,7 +3,24 @@ spring:
     active: db, core, wx
   messages:
     encoding: UTF-8
-
+  cache:
+    pool:
+      min-idle: 3
+      max-idle: 5
+      max-total: 10
+      max-wait-millis: 5000
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      test-between-eviction-runs-millis: 3000
+      num-tests-pre-eviction-run: 1
+      min-evictable-idle-time-millis: -1
+      soft-min-evictable-time-millis: 30000
+    redis:
+      database: 0
+      host: 172.30.63.86
+      port: 6379
+      password:
 server:
   port: 8082
 

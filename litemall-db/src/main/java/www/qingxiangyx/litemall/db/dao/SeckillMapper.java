@@ -125,4 +125,7 @@ public interface SeckillMapper {
      * @mbg.generated
      */
     int updateByPrimaryKey(Seckill record);
+
+    int reduceInventory(@Param("seckillId") long seckillId, @Param("oldVersion") long oldVersion,
+                        @Param("newVersion") long newVersion);
 }

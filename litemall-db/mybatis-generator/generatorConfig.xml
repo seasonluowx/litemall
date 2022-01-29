@@ -187,8 +187,8 @@
         <table tableName="seckill">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
-        <table tableName="seckill_order">
+        <!--<table tableName="seckill_order">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
+        </table>-->
     </context>
 </generatorConfiguration>
