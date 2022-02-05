@@ -6,6 +6,7 @@ import www.qingxiangyx.litemall.core.system.SystemConfig;
 import www.qingxiangyx.litemall.core.util.ResponseUtil;
 import www.qingxiangyx.litemall.db.domain.LitemallCategory;
 import www.qingxiangyx.litemall.db.domain.LitemallGoods;
+import www.qingxiangyx.litemall.db.service.SeckillService;
 import www.qingxiangyx.litemall.wx.annotation.LoginUser;
 import www.qingxiangyx.litemall.wx.service.HomeCacheManager;
 import www.qingxiangyx.litemall.wx.service.WxGrouponRuleService;
@@ -54,6 +55,9 @@ public class WxHomeController {
 
     @Autowired
     private WxGrouponRuleService grouponService;
+
+    @Autowired
+    private SeckillService seckillService;
 
     @Autowired
     private LitemallCouponService couponService;
@@ -112,7 +116,7 @@ public class WxHomeController {
         //团购专区
         Callable<List> grouponListCallable = () -> grouponService.queryList(0, 5);
         //秒杀
-        Callable<List> secKillListCallable = () -> goodsService.querySeckill(0, 3);
+        Callable<List> secKillListCallable = () -> seckillService.getSeckillList();
 
         Callable<List> floorGoodsListCallable = this::getCategoryList;
 
@@ -156,9 +160,6 @@ public class WxHomeController {
         catch (Exception e) {
             e.printStackTrace();
         }
-//        finally {
-//            executorService.shutdown();
-//        }
         return ResponseUtil.ok(entity);
     }
 

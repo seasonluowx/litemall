@@ -45,39 +45,23 @@ public class WxSeckillController {
     @Autowired
     private SeckillService seckillService;
 
-    @RequestMapping("/demo")
-    @ResponseBody
-    public String demo() {
-        long seckillId = 1000L;
-        SeckillVo seckill = seckillService.getById(seckillId);
-        Thread currentThread = Thread.currentThread();
-        log.info("thread.hashCode={},id={},name={}"
-                , currentThread.hashCode(), currentThread.getId(), currentThread.getName());
-        return JSON.toJSONString(seckill);
-    }
-
     /**
      * 秒杀产品列表
      */
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public String list(Model model) {
+    @GetMapping(value = "/list")
+    public Object list() {
         //获取列表页
         List<SeckillVo> list = seckillService.getSeckillList();
-        model.addAttribute("list", list);
-        return "list";
+        return ResponseUtil.ok(list);
     }
 
-    @RequestMapping(value = "/detail/{seckillId}", method = RequestMethod.GET)
-    public String detail(@PathVariable("seckillId") Long seckillId, Model model) {
+    @GetMapping(value = "/detail/{seckillId}")
+    public Object detail(@PathVariable("seckillId") Long seckillId) {
         if (seckillId == null) {
             return "redirect:/seckill/list";
         }
         SeckillVo seckill = seckillService.getById(seckillId);
-        if (seckill == null) {
-            return "forward:/seckill/list";
-        }
-        model.addAttribute("seckill", seckill);
-        return "detail";
+        return ResponseUtil.ok(seckill);
     }
 
     //ajax json

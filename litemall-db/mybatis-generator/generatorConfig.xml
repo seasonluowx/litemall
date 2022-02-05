@@ -96,12 +96,12 @@
         <table tableName="litemall_footprint">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>-->
-        <!--<table tableName="litemall_goods">
+        <table tableName="litemall_goods">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
             <columnOverride column="gallery" javaType="java.lang.String[]"
                             typeHandler="www.qingxiangyx.litemall.db.mybatis.JsonStringArrayTypeHandler"/>
         </table>
-        <table tableName="litemall_goods_attribute">
+        <!--<table tableName="litemall_goods_attribute">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
         <table tableName="litemall_goods_specification">
@@ -183,10 +183,10 @@
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
             <columnOverride column="pictures" javaType="java.lang.String[]"
                             typeHandler="www.qingxiangyx.litemall.db.mybatis.JsonStringArrayTypeHandler"/>
-        </table>-->
+        </table>
         <table tableName="seckill">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
+        </table>-->
         <!--<table tableName="seckill_order">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>-->
