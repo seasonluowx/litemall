@@ -34,7 +34,6 @@ Page({
     wx.hideNavigationBarLoading() //完成停止加载
     wx.stopPullDownRefresh() //停止下拉刷新
   },
-
   getIndexData: function() {
     let that = this;
     util.request(api.IndexUrl).then(function(res) {
@@ -46,11 +45,12 @@ Page({
           brands: res.data.brandList,
           floorGoods: res.data.floorGoodsList,
           banner: res.data.banner,
-          groupons: res.data.grouponList,
           seckill: res.data.seckillList,
+          groupons: res.data.grouponList,
           channel: res.data.channel,
           coupon: res.data.couponList
         });
+        that.seckillConvert();
       }
     });
     util.request(api.GoodsCount).then(function (res) {
@@ -58,6 +58,20 @@ Page({
         goodsCount: res.data
       });
     });
+  },
+  seckillConvert: function(){
+    let wxSeckillList = [];
+    let that = this;
+    let orgSeckill = this.data.seckill;
+    for(var o of orgSeckill){
+      let nowCountdown = util.countdownNow(o.endTime);
+      let wxSeckill = {...o,nowCountdown};
+      wxSeckillList.push(wxSeckill);
+    };
+    that.setData({
+      seckill: wxSeckillList
+    });
+    setTimeout(that.seckillConvert,1000);
   },
   onLoad: function(options) {
 
@@ -139,5 +153,5 @@ Page({
         util.showErrorToast(res.errmsg);
       }
     })
-  },
+  }
 })

@@ -94,6 +94,7 @@ module.exports = {
 
   IndexSeckill: WxApiRoot + 'index/seckill', //首页秒杀产品
   SecKillList: WxApiRoot + 'seckill/list',//秒杀
+  SecKillDetail: WxApiRoot + 'seckill/detail/',//秒杀
 
   StorageUpload: WxApiRoot + 'storage/upload', //图片上传
 

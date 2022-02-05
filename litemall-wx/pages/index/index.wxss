@@ -533,3 +533,26 @@
   padding-left: 10rpx;
   font-size: 30rpx;
 }
+
+.tui-countdown-content{
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  background-color: #fff;
+  margin-top: 15px;
+  padding: 0 15px;
+  font-size: 18px;
+}
+.tui-conutdown-box{
+  display: inline-block;
+  height: 20px;
+  width: 10px;
+  line-height: 20px;
+  text-align: center;
+  /* background-color: #000; */
+  color: #fff;
+  margin: 0 5px;
+}
+.tui-countdown-bg{
+  background-color: #DF0101;
+}

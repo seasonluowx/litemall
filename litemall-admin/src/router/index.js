@@ -269,7 +269,7 @@ export const asyncRoutes = [
           title: '商品编辑',
           noCache: true
         },
-        hidden: true
+        hidden: false
       },
       {
         path: 'comment',
@@ -280,6 +280,49 @@ export const asyncRoutes = [
           title: '商品评论',
           noCache: true
         }
+      }
+    ]
+  }, {
+    path: '/seckill',
+    component: Layout,
+    redirect: 'noredirect',
+    alwaysShow: true,
+    name: 'seckillManage',
+    meta: {
+      title: '秒杀管理',
+      icon: 'chart'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/seckill/list'),
+        name: 'seckillList',
+        meta: {
+          perms: ['GET /admin/seckill/list', 'POST /admin/seckill/delete'],
+          title: '秒杀商品列表',
+          noCache: true
+        }
+      },
+      {
+        path: 'create',
+        component: () => import('@/views/seckill/create'),
+        name: 'seckillCreate',
+        meta: {
+          perms: ['POST /admin/seckill/create'],
+          title: '秒杀商品上架',
+          noCache: true
+        }
+      },
+      {
+        path: 'edit',
+        component: () => import('@/views/seckill/edit'),
+        name: 'seckillEdit',
+        meta: {
+          perms: ['GET /admin/seckill/detail', 'POST /admin/seckill/update', 'POST /admin/seckill/catAndBrand'],
+          title: '秒杀商品编辑',
+          noCache: true
+        },
+        hidden: true
       }
     ]
   },
