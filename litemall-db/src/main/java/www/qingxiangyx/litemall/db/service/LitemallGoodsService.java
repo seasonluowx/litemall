@@ -89,16 +89,7 @@ public class LitemallGoodsService {
         return goodsMapper.selectByExampleSelective(example, columns);
     }
 
-    public List<LitemallGoods> querySeckill(int offset, int limit) {
-        LitemallGoodsExample example = new LitemallGoodsExample();
-        example.or().andSellTypeEqualTo(GoodSellTypeEnum.SECKILL.getCode()).andIsOnSaleEqualTo(true).andDeletedEqualTo(false);
-        example.setOrderByClause("add_time desc");
-        PageHelper.startPage(offset, limit);
-        return goodsMapper.selectByExampleSelective(example, columns);
-    }
-
-
-    public List<LitemallGoods> querySelective(Integer catId, Integer brandId, String keywords, Boolean isHot, Boolean isNew,Integer sellType,Integer offset, Integer limit, String sort, String order) {
+    public List<LitemallGoods> querySelective(Integer catId, Integer brandId, String keywords, Boolean isHot, Boolean isNew,Integer offset, Integer limit, String sort, String order) {
         LitemallGoodsExample example = new LitemallGoodsExample();
         LitemallGoodsExample.Criteria criteria1 = example.or();
         LitemallGoodsExample.Criteria criteria2 = example.or();
@@ -127,8 +118,6 @@ public class LitemallGoodsService {
         criteria2.andIsOnSaleEqualTo(true);
         criteria1.andDeletedEqualTo(false);
         criteria2.andDeletedEqualTo(false);
-        criteria1.andSellTypeEqualTo(sellType.byteValue());
-        criteria2.andSellTypeEqualTo(sellType.byteValue());
 
         if (!StringUtils.isEmpty(sort) && !StringUtils.isEmpty(order)) {
             example.setOrderByClause(sort + " " + order);
