@@ -1,7 +1,6 @@
 package www.qingxiangyx.litemall.wx.service;
 
 import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
-import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.order.WxPayMwebOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.result.BaseWxPayResult;
@@ -10,8 +9,6 @@ import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +27,7 @@ import www.qingxiangyx.litemall.core.util.ResponseUtil;
 import www.qingxiangyx.litemall.core.wxclient.WxHttpPayService;
 import www.qingxiangyx.litemall.core.wxclient.domain.WxOrderResult;
 import www.qingxiangyx.litemall.core.wxclient.domain.WxPayNotifyResult;
+import www.qingxiangyx.litemall.core.wxclient.domain.WxPayResponse;
 import www.qingxiangyx.litemall.db.domain.LitemallAddress;
 import www.qingxiangyx.litemall.db.domain.LitemallCart;
 import www.qingxiangyx.litemall.db.domain.LitemallComment;
@@ -724,21 +722,24 @@ public class WxOrderService {
             return WxPayNotifyResponse.fail(e.getMessage());
         }
         log.info("notify result :{}",notifyResult);
+        return parseAndProcessNotify(notifyResult);
+    }
+
+    public WxPayResponse parseAndProcessNotify(String notifyResult) {
         WxPayNotifyResult result = null;
         try {
             result = wxHttpPayService.parseOrderNotifyResult(notifyResult);
-
-            if(!WxPayConstants.ResultCode.SUCCESS.equals(result.getResultCode())){
-                log.error(notifyResult);
-                throw new WxPayException("微信通知支付失败！");
-            }
             if(!WxPayConstants.ResultCode.SUCCESS.equals(result.getReturnCode())){
                 log.error(notifyResult);
                 throw new WxPayException("微信通知支付失败！");
             }
+            if(!WxPayConstants.ResultCode.SUCCESS.equals(result.getTradeState())){
+                log.error(notifyResult);
+                throw new WxPayException("微信通知支付失败！");
+            }
         } catch (WxPayException e) {
-            e.printStackTrace();
-            return WxPayNotifyResponse.fail(e.getMessage());
+            log.error("parseOrderNotifyResult error",e);
+            return WxPayResponse.fail(e.getMessage());
         }
 
         log.info("处理腾讯支付平台的订单支付{}",result);
@@ -747,27 +748,27 @@ public class WxOrderService {
         String payId = result.getTransactionId();
 
         // 分转化成元
-        String totalFee = BaseWxPayResult.fenToYuan(result.getTotalFee());
+        String totalFee = BaseWxPayResult.fenToYuan(result.getAmount().getTotal());
         LitemallOrder order = orderService.findBySn(orderSn);
         if (order == null) {
-            return WxPayNotifyResponse.fail("订单不存在 sn=" + orderSn);
+            return WxPayResponse.fail("订单不存在 sn=" + orderSn);
         }
 
         // 检查这个订单是否已经处理过
         if (OrderUtil.hasPayed(order)) {
-            return WxPayNotifyResponse.success("订单已经处理成功!");
+            return WxPayResponse.success("订单已经处理成功!");
         }
 
         // 检查支付订单金额
         if (!totalFee.equals(order.getActualPrice().toString())) {
-            return WxPayNotifyResponse.fail(order.getOrderSn() + " : 支付金额不符合 totalFee=" + totalFee);
+            return WxPayResponse.fail(order.getOrderSn() + " : 支付金额不符合 totalFee=" + totalFee);
         }
 
         order.setPayId(payId);
         order.setPayTime(LocalDateTime.now());
         order.setOrderStatus(OrderUtil.STATUS_PAY);
         if (orderService.updateWithOptimisticLocker(order) == 0) {
-            return WxPayNotifyResponse.fail("更新数据已失效");
+            return WxPayResponse.fail("更新数据已失效");
         }
 
         //  支付成功，有团购信息，更新团购信息
@@ -782,7 +783,7 @@ public class WxOrderService {
             }
             groupon.setStatus(GrouponConstant.STATUS_ON);
             if (grouponService.updateById(groupon) == 0) {
-                return WxPayNotifyResponse.fail("更新数据已失效");
+                return WxPayResponse.fail("更新数据已失效");
             }
 
 
@@ -818,7 +819,7 @@ public class WxOrderService {
         // 取消订单超时未支付任务
         taskService.removeTask(new OrderUnpaidTask(order.getId()));
 
-        return WxPayNotifyResponse.success("处理成功!");
+        return WxPayResponse.success("处理成功!");
     }
 
     /**

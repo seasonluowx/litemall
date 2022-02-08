@@ -101,15 +101,24 @@ public class WxHttpPayService {
     public WxPayNotifyResult parseOrderNotifyResult(String notifyResult) {
         WxPayNotifyResult wxPayNotifyResult = new WxPayNotifyResult();
         JSONObject result = JSON.parseObject(notifyResult);
-        String associatedData = result.getString("associated_data");
-        String nonce = result.getString("nonce");
-        String ciphertext = result.getString("ciphertext");
+        String eventType = result.getString("event_type");
+        if(!"TRANSACTION.SUCCESS".equals(eventType)){
+            log.error("pay order {}",eventType);
+            wxPayNotifyResult.setReturnCode(eventType);
+            return wxPayNotifyResult;
+        }
+        String resource = result.getString("resource");
+        JSONObject resourceData = JSON.parseObject(resource);
+        String associatedData = resourceData.getString("associated_data");
+        String nonce = resourceData.getString("nonce");
+        String ciphertext = resourceData.getString("ciphertext");
         byte[] associatedDataByte = StringUtils.isNotBlank(associatedData)?associatedData.getBytes(StandardCharsets.UTF_8):null;
         AesUtil aesUtil = new AesUtil(properties.getMchKey().getBytes(StandardCharsets.UTF_8));
         try {
             String decryptText = aesUtil.decryptToString(associatedDataByte,nonce.getBytes(StandardCharsets.UTF_8),ciphertext);
             log.info("[decryptText]:{}",decryptText);
             wxPayNotifyResult = JSON.parseObject(decryptText,WxPayNotifyResult.class);
+            wxPayNotifyResult.setReturnCode("SUCCESS");
             log.info("[parse result]:{}",wxPayNotifyResult);
         } catch (GeneralSecurityException e) {
             e.printStackTrace();

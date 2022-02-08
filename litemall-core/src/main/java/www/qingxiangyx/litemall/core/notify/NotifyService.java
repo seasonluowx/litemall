@@ -73,9 +73,9 @@ public class NotifyService {
      * @return
      */
     public SmsResult notifySmsTemplateSync(String phoneNumber, NotifyType notifyType, String[] params) {
-        if (smsSender == null)
+        if (smsSender == null) {
             return null;
-
+        }
         return smsSender.sendWithTemplate(phoneNumber, getTemplateId(notifyType, smsTemplate), params);
     }
 
@@ -88,9 +88,9 @@ public class NotifyService {
      */
     @Async
     public void notifyMail(String subject, String content) {
-        if (mailSender == null)
+        if (mailSender == null) {
             return;
-
+        }
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(sendFrom);
         message.setTo(sendTo);
@@ -103,8 +103,9 @@ public class NotifyService {
         for (Map<String, String> item : values) {
             String notifyTypeStr = notifyType.getType();
 
-            if (item.get("name").equals(notifyTypeStr))
+            if (item.get("name").equals(notifyTypeStr)) {
                 return item.get("templateId");
+            }
         }
         return null;
     }
