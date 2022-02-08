@@ -15,6 +15,8 @@ public class WxProperties {
 
     private String mchKey;
 
+    private String mchSerialkey;
+
     private String notifyUrl;
 
     private String keyPath;
@@ -65,5 +67,13 @@ public class WxProperties {
 
     public void setKeyPath(String keyPath) {
         this.keyPath = keyPath;
+    }
+
+    public String getMchSerialkey() {
+        return mchSerialkey;
+    }
+
+    public void setMchSerialkey(String mchSerialkey) {
+        this.mchSerialkey = mchSerialkey;
     }
 }

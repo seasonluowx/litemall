@@ -107,7 +107,6 @@ public class WxOrderController {
     /**
      * 微信付款成功或失败回调接口
      * <p>
-     *  TODO
      *  注意，这里pay-notify是示例地址，建议开发者应该设立一个隐蔽的回调地址
      *
      * @param request 请求内容

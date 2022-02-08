@@ -1,6 +1,7 @@
 package www.qingxiangyx.litemall.core.qcode;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
+import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,16 +19,17 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 
+@Slf4j
 @Service
 public class QCodeService {
-    private final Log logger = LogFactory.getLog(QCodeService.class);
     @Autowired
-    WxMaService wxMaService;
+    private WxMaService wxMaService;
 
     @Autowired
     private StorageService storageService;
 
 
+    //TODO
     public String createGrouponShareImage(String goodName, String goodPicUrl, LitemallGroupon groupon) {
         try {
             //创建该商品的二维码
@@ -43,11 +45,11 @@ public class QCodeService {
 
             return storageInfo.getUrl();
         } catch (WxErrorException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         } catch (FileNotFoundException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         return "";
@@ -62,9 +64,9 @@ public class QCodeService {
      * @param goodName
      */
     public String createGoodShareImage(String goodId, String goodPicUrl, String goodName) {
-        if (!SystemConfig.isAutoCreateShareImage())
+        if (!SystemConfig.isAutoCreateShareImage()) {
             return "";
-
+        }
         try {
             //创建该商品的二维码
             File file = wxMaService.getQrcodeService().createWxaCodeUnlimit("goods," + goodId, "pages/index/index");
@@ -78,11 +80,11 @@ public class QCodeService {
 
             return litemallStorage.getUrl();
         } catch (WxErrorException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         } catch (FileNotFoundException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         return "";

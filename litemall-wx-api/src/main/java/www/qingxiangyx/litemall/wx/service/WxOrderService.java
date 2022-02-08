@@ -2,16 +2,20 @@ package www.qingxiangyx.litemall.wx.service;
 
 import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
-import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.order.WxPayMwebOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.result.BaseWxPayResult;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import www.qingxiangyx.litemall.core.express.ExpressService;
 import www.qingxiangyx.litemall.core.express.dao.ExpressInfo;
 import www.qingxiangyx.litemall.core.notify.NotifyService;
@@ -20,8 +24,12 @@ import www.qingxiangyx.litemall.core.qcode.QCodeService;
 import www.qingxiangyx.litemall.core.system.SystemConfig;
 import www.qingxiangyx.litemall.core.task.TaskService;
 import www.qingxiangyx.litemall.core.util.DateTimeUtil;
+import www.qingxiangyx.litemall.core.util.IpUtil;
 import www.qingxiangyx.litemall.core.util.JacksonUtil;
 import www.qingxiangyx.litemall.core.util.ResponseUtil;
+import www.qingxiangyx.litemall.core.wxclient.WxHttpPayService;
+import www.qingxiangyx.litemall.core.wxclient.domain.WxOrderResult;
+import www.qingxiangyx.litemall.core.wxclient.domain.WxPayNotifyResult;
 import www.qingxiangyx.litemall.db.domain.LitemallAddress;
 import www.qingxiangyx.litemall.db.domain.LitemallCart;
 import www.qingxiangyx.litemall.db.domain.LitemallComment;
@@ -51,12 +59,7 @@ import www.qingxiangyx.litemall.db.util.CouponUserConstant;
 import www.qingxiangyx.litemall.db.util.GrouponConstant;
 import www.qingxiangyx.litemall.db.util.OrderHandleOption;
 import www.qingxiangyx.litemall.db.util.OrderUtil;
-import www.qingxiangyx.litemall.core.util.IpUtil;
 import www.qingxiangyx.litemall.wx.task.OrderUnpaidTask;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -68,7 +71,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static www.qingxiangyx.litemall.wx.util.WxResponseCode.*;
+import static www.qingxiangyx.litemall.wx.util.WxResponseCode.AUTH_OPENID_UNACCESS;
+import static www.qingxiangyx.litemall.wx.util.WxResponseCode.GROUPON_EXPIRED;
+import static www.qingxiangyx.litemall.wx.util.WxResponseCode.GROUPON_FULL;
+import static www.qingxiangyx.litemall.wx.util.WxResponseCode.GROUPON_JOIN;
+import static www.qingxiangyx.litemall.wx.util.WxResponseCode.GROUPON_OFFLINE;
+import static www.qingxiangyx.litemall.wx.util.WxResponseCode.ORDER_COMMENTED;
+import static www.qingxiangyx.litemall.wx.util.WxResponseCode.ORDER_COMMENT_EXPIRED;
+import static www.qingxiangyx.litemall.wx.util.WxResponseCode.ORDER_INVALID;
+import static www.qingxiangyx.litemall.wx.util.WxResponseCode.ORDER_INVALID_OPERATION;
+import static www.qingxiangyx.litemall.wx.util.WxResponseCode.ORDER_PAY_FAIL;
+import static www.qingxiangyx.litemall.wx.util.WxResponseCode.ORDER_UNKNOWN;
 
 /**
  * 订单服务
@@ -88,10 +101,9 @@ import static www.qingxiangyx.litemall.wx.util.WxResponseCode.*;
  * 当401用户确认收货以后，此时用户可以进行的操作是删除订单，评价商品，申请售后，或者再次购买
  * 当402系统自动确认收货以后，此时用户可以删除订单，评价商品，申请售后，或者再次购买
  */
+@Slf4j
 @Service
 public class WxOrderService {
-    private final Log logger = LogFactory.getLog(WxOrderService.class);
-
     @Autowired
     private LitemallUserService userService;
     @Autowired
@@ -108,6 +120,8 @@ public class WxOrderService {
     private LitemallGoodsProductService productService;
     @Autowired
     private WxPayService wxPayService;
+    @Autowired
+    private WxHttpPayService wxHttpPayService;
     @Autowired
     private NotifyService notifyService;
     @Autowired
@@ -608,7 +622,8 @@ public class WxOrderService {
         if (openid == null) {
             return ResponseUtil.fail(AUTH_OPENID_UNACCESS, "订单不能支付");
         }
-        WxPayMpOrderResult result = null;
+//        WxPayMpOrderResult result = null;
+        WxOrderResult result = null;
         try {
             WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
             orderRequest.setOutTradeNo(order.getOrderSn());
@@ -621,7 +636,8 @@ public class WxOrderService {
             orderRequest.setTotalFee(fee);
             orderRequest.setSpbillCreateIp(IpUtil.getIpAddr(request));
 
-            result = wxPayService.createOrder(orderRequest);
+//            result = wxPayService.createOrder(orderRequest);
+            result = wxHttpPayService.jsApi(orderRequest);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseUtil.fail(ORDER_PAY_FAIL, "订单不能支付");
@@ -700,24 +716,24 @@ public class WxOrderService {
      */
     @Transactional
     public Object payNotify(HttpServletRequest request, HttpServletResponse response) {
-        String xmlResult = null;
+        String notifyResult = null;
         try {
-            xmlResult = IOUtils.toString(request.getInputStream(), request.getCharacterEncoding());
+            notifyResult = IOUtils.toString(request.getInputStream(), request.getCharacterEncoding());
         } catch (IOException e) {
             e.printStackTrace();
             return WxPayNotifyResponse.fail(e.getMessage());
         }
-
-        WxPayOrderNotifyResult result = null;
+        log.info("notify result :{}",notifyResult);
+        WxPayNotifyResult result = null;
         try {
-            result = wxPayService.parseOrderNotifyResult(xmlResult);
+            result = wxHttpPayService.parseOrderNotifyResult(notifyResult);
 
             if(!WxPayConstants.ResultCode.SUCCESS.equals(result.getResultCode())){
-                logger.error(xmlResult);
+                log.error(notifyResult);
                 throw new WxPayException("微信通知支付失败！");
             }
             if(!WxPayConstants.ResultCode.SUCCESS.equals(result.getReturnCode())){
-                logger.error(xmlResult);
+                log.error(notifyResult);
                 throw new WxPayException("微信通知支付失败！");
             }
         } catch (WxPayException e) {
@@ -725,8 +741,7 @@ public class WxOrderService {
             return WxPayNotifyResponse.fail(e.getMessage());
         }
 
-        logger.info("处理腾讯支付平台的订单支付");
-        logger.info(result);
+        log.info("处理腾讯支付平台的订单支付{}",result);
 
         String orderSn = result.getOutTradeNo();
         String payId = result.getTransactionId();
