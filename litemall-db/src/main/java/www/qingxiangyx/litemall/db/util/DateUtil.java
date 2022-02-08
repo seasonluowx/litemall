@@ -19,10 +19,12 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Created by Eleven.Wang
@@ -427,8 +429,7 @@ public class DateUtil {
 	public static String localDateTimeToString(LocalDateTime localDateTime){
 		return localDateTime.format(formatters4);
 	}
-	/*public static void main(String[] args) {
-		LocalDate localDate = DateUtil.parse("2020-01-01");
-		System.out.printf(localDate.toString()+"是第"+DateUtil.getWeekOfYear(localDate)+"周");
-	}*/
+	public static void main(String[] args) {
+		System.out.println("args = " + UUID.randomUUID());
+	}
 }
